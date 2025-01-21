@@ -1,6 +1,0 @@
-services:
-  - name: aqi-collector
-    type: web
-    env: python
-    buildCommand: "pip install --upgrade pip && pip install wheel && pip install -r requirements.txt"
-    startCommand: "gunicorn app:app"

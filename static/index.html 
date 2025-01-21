@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India AQI Dashboard</title>
+    <!-- Add Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add React and ReactDOM -->
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <!-- Add Babel for JSX -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <!-- Add Recharts for graphs -->
+    <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = Recharts;
+
+        function Dashboard() {
+            const [latestData, setLatestData] = useState([]);
+            const [selectedCity, setSelectedCity] = useState(null);
+            const [cityHistory, setCityHistory] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+
+            const fetchLatestData = async () => {
+                try {
+                    const response = await fetch('/api/latest');
+                    const data = await response.json();
+                    setLatestData(data);
+                    setLoading(false);
+                } catch (err) {
+                    setError('Failed to fetch latest data');
+                    setLoading(false);
+                }
+            };
+
+            const fetchCityHistory = async (city) => {
+                try {
+                    const response = await fetch(`/api/history/${city}`);
+                    const data = await response.json();
+                    setCityHistory(data);
+                } catch (err) {
+                    setError('Failed to fetch city history');
+                }
+            };
+
+            useEffect(() => {
+                fetchLatestData();
+                const interval = setInterval(fetchLatestData, 3600000); // Refresh every hour
+                return () => clearInterval(interval);
+            }, []);
+
+            useEffect(() => {
+                if (selectedCity) {
+                    fetchCityHistory(selectedCity);
+                }
+            }, [selectedCity]);
+
+            const getAQIColor = (aqi) => {
+                if (aqi <= 50) return 'bg-green-100';
+                if (aqi <= 100) return 'bg-yellow-100';
+                if (aqi <= 150) return 'bg-orange-100';
+                if (aqi <= 200) return 'bg-red-100';
+                if (aqi <= 300) return 'bg-purple-100';
+                return 'bg-rose-100';
+            };
+
+            if (loading) return <div className="p-4">Loading...</div>;
+            if (error) return <div className="p-4 text-red-500">{error}</div>;
+
+            return (
+                <div className="container mx-auto p-4">
+                    <h1 className="text-2xl font-bold mb-4">Real-time India AQI Dashboard</h1>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {latestData.map((city) => (
+                            <div 
+                                key={city.city}
+                                className={`${getAQIColor(city.aqi)} p-4 rounded-lg shadow cursor-pointer`}
+                                onClick={() => setSelectedCity(city.city)}
+                            >
+                                <h2 className="text-xl font-bold">{city.city}</h2>
+                                <div className="text-3xl font-bold mt-2">{city.aqi}</div>
+                                <div className="text-sm text-gray-600">
+                                    Last updated: {new Date(city.timestamp).toLocaleString()}
+                                </div>
+                                <div className="mt-2">
+                                    <div>Temperature: {city.temperature}°C</div>
+                                    <div>Humidity: {city.humidity}%</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {selectedCity && cityHistory.length > 0 && (
+                        <div className="mt-8 bg-white p-4 rounded-lg shadow">
+                            <h2 className="text-xl font-bold mb-4">{selectedCity} - 24 Hour History</h2>
+                            <div className="h-96">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={cityHistory}>
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis 
+                                            dataKey="timestamp" 
+                                            tickFormatter={(timestamp) => new Date(timestamp).toLocaleTimeString()} 
+                                        />
+                                        <YAxis />
+                                        <Tooltip 
+                                            labelFormatter={(timestamp) => new Date(timestamp).toLocaleString()}
+                                        />
+                                        <Legend />
+                                        <Line type="monotone" dataKey="aqi" stroke="#8884d8" name="AQI" />
+                                        <Line type="monotone" dataKey="temperature" stroke="#82ca9d" name="Temperature" />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<Dashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>

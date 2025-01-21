@@ -1,14 +1,6 @@
 services:
-  - type: web
-    name: india-aqi-dashboard
+  - name: aqi-collector
+    type: web
     env: python
-    buildCommand: |
-      apt-get update
-      apt-get install -y build-essential python3-dev
-      pip install --upgrade pip
-      pip install wheel
-      pip install -r requirements.txt
-    startCommand: gunicorn app:app
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.9.16
+    buildCommand: "pip install --upgrade pip && pip install wheel && pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"

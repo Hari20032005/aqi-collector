@@ -40,3 +40,17 @@ jobs:
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add data/aqi_data.csv
         git diff --quiet && git diff --staged --quiet || (git commit -m "Update AQI data [skip ci]" && git push origin main)
+    - name: Preserve docs folder
+      run: |
+        if [ -d docs ]; then
+          cp -r docs/ docs_backup/
+        fi
+    
+    # ... existing commit/push step ...
+
+    - name: Restore docs folder
+      run: |
+        if [ -d docs_backup ]; then
+          cp -r docs_backup/ docs/
+          rm -rf docs_backup/
+        fi

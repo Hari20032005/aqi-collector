@@ -54,3 +54,13 @@ jobs:
           cp -r docs_backup/ docs/
           rm -rf docs_backup/
         fi
+
+    - name: Move data to docs
+      run: |
+        mkdir -p docs/data
+        cp data/aqi_data.csv docs/data/
+
+    - name: Commit and push
+      run: |
+       git add .
+       git diff --quiet && git diff --staged --quiet || (git commit -m "Update data and docs" && git push)

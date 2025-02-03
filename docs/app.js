@@ -1,6 +1,5 @@
 // Replace with your GitHub username and repo name
-const DATA_URL = 'https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/data/aqi_data.csv';
-
+const DATA_URL = 'https://raw.githubusercontent.com/Hari20032005/aqi-collector/main/data/aqi_data.csv';
 async function loadData() {
     try {
         const response = await fetch(DATA_URL);

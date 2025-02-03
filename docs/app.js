@@ -1,6 +1,6 @@
 // Configuration
 const CITIES = ['Delhi', 'Mumbai', 'Chennai', 'Kolkata', 'Bengaluru'];
-const DATA_URL = 'https://cdn.jsdelivr.net/gh/YOUR_USERNAME/YOUR_REPO/data/aqi_data.csv';
+const DATA_URL = 'https://cdn.jsdelivr.net/gh/Hari20032005/https://github.com/Hari20032005/aqi-collector/data/aqi_data.csv';
 
 let aqiChart, pollutantsChart;
 let allData = [];

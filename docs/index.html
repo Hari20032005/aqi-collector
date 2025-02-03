@@ -1,33 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQI Visualization</title>
-    <link rel="stylesheet" href="style.css">
+    <title>AQI Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+    <style>
+        .chart-box {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+    </style>
 </head>
 <body>
-    <h1>Air Quality Visualization</h1>
+    <h1>Air Quality Index Dashboard</h1>
     
-    <div class="controls">
-        <select id="citySelect">
-            <option value="Delhi">Delhi</option>
-            <option value="Mumbai">Mumbai</option>
-            <!-- Add other cities -->
-        </select>
-        <button onclick="updateCharts('daily')">Daily</button>
-        <button onclick="updateCharts('weekly')">Weekly</button>
-        <button onclick="updateCharts('monthly')">Monthly</button>
-    </div>
-
-    <div class="chart-container">
+    <div class="chart-box">
         <canvas id="aqiChart"></canvas>
-    </div>
-
-    <div class="chart-container">
-        <canvas id="pollutantsChart"></canvas>
     </div>
 
     <script src="app.js"></script>

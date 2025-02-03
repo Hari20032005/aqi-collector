@@ -1,14 +1,53 @@
-body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+// REPLACE WITH YOUR ACTUAL DATA PATH
+const DATA_URL = 'https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/data/aqi_data.csv';
+
+async function init() {
+    try {
+        // 1. Load Data
+        const response = await fetch(DATA_URL);
+        if (!response.ok) throw new Error('Failed to load data');
+        const csvText = await response.text();
+        
+        // 2. Parse Data
+        const data = csvText.split('\n')
+            .slice(1)
+            .filter(row => row.trim())
+            .map(row => {
+                const [city, timestamp, aqi] = row.split(',');
+                return {
+                    city: city,
+                    date: new Date(timestamp),
+                    aqi: parseFloat(aqi)
+                };
+            });
+        
+        // 3. Create Chart
+        const ctx = document.getElementById('aqiChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => `${d.date.toLocaleDateString()} ${d.date.toLocaleTimeString()}`),
+                datasets: [{
+                    label: 'AQI Index',
+                    data: data.map(d => d.aqi),
+                    borderColor: '#4CAF50',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Time' } },
+                    y: { title: { display: true, text: 'AQI' } }
+                }
+            }
+        });
+        
+    } catch (error) {
+        console.error('Initialization failed:', error);
+        document.body.innerHTML = `<div class="error">Error loading data: ${error.message}</div>`;
+    }
 }
 
-.chart-container {
-    margin-top: 40px;
-    padding: 20px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background: white;
-}
+// Start the application
+init();

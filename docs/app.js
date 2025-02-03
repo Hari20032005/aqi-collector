@@ -1,5 +1,5 @@
 // REPLACE WITH YOUR ACTUAL DATA PATH
-const DATA_URL = 'https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/data/aqi_data.csv';
+const DATA_URL = 'https://raw.githubusercontent.com/Hari20032005/aqi-collector/main/data/aqi_data.csv';
 
 async function init() {
     try {

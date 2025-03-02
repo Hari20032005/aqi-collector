@@ -23,6 +23,7 @@ jobs:
     - name: Run collector
       env:
         OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+        POWERBI_PUSH_URL: ${{ secrets.POWERBI_PUSH_URL }}
       run: python aqi_collector.py
 
     - name: Prepare docs

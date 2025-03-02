@@ -1,3 +1,4 @@
+# aqi_collector.py
 import os
 import requests
 import pandas as pd
@@ -5,37 +6,27 @@ from datetime import datetime
 import time
 import logging
 from pathlib import Path
-import json
 
 class GitHubAQICollector:
     def __init__(self):
         # Setup logging
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s'
+        )
         
         # OpenWeatherMap API key from GitHub secrets
         self.api_key = os.environ.get('OPENWEATHER_API_KEY')
+        
+        # Power BI Push URL from GitHub secrets
+        self.push_url = os.environ.get('POWERBI_PUSH_URL')
         
         # Setup data storage
         self.data_dir = Path('data')
         self.data_dir.mkdir(exist_ok=True)
         self.csv_path = self.data_dir / 'aqi_data.csv'
         
-        # Retrieve Power BI push URLs from environment variables
-        self.push_urls = {
-            'Delhi': os.environ.get('POWERBI_PUSH_URL_DELHI'),
-            'Mumbai': os.environ.get('POWERBI_PUSH_URL_MUMBAI'),
-            'Chennai': os.environ.get('POWERBI_PUSH_URL_CHENNAI'),
-            'Kolkata': os.environ.get('POWERBI_PUSH_URL_KOLKATA'),
-            'Bengaluru': os.environ.get('POWERBI_PUSH_URL_BENGALURU'),
-            'Ahmedabad': os.environ.get('POWERBI_PUSH_URL_AHMEDABAD'),
-            'Lucknow': os.environ.get('POWERBI_PUSH_URL_LUCKNOW'),
-            'Hyderabad': os.environ.get('POWERBI_PUSH_URL_HYDERABAD'),
-            'Jaipur': os.environ.get('POWERBI_PUSH_URL_JAIPUR'),
-            'Patna': os.environ.get('POWERBI_PUSH_URL_PATNA')
-        }
-        self.main_push_url = os.environ.get('POWERBI_PUSH_URL_ALL')
-        
-        # Initialize CSV if it doesn’t exist
+        # Initialize CSV if it doesn't exist
         if not self.csv_path.exists():
             self.setup_csv()
 
@@ -48,7 +39,7 @@ class GitHubAQICollector:
         pd.DataFrame(columns=columns).to_csv(self.csv_path, index=False)
 
     def collect_data(self, city):
-        """Collect AQI data for a city"""
+        """Collect AQI data for a city and push to Power BI"""
         try:
             # Get coordinates
             geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={self.api_key}"
@@ -86,12 +77,17 @@ class GitHubAQICollector:
                 'collection_status': 'success'
             }
 
-            # Append to CSV
+            # Append to CSV (optional backup)
             df = pd.DataFrame([record])
             df.to_csv(self.csv_path, mode='a', header=False, index=False)
 
             # Push to Power BI
-            self.push_to_powerbi(record)
+            if self.push_url:
+                response = requests.post(self.push_url, json=[record])
+                if response.status_code == 200:
+                    logging.info(f"Successfully pushed data to Power BI for {city}")
+                else:
+                    logging.error(f"Failed to push data to Power BI for {city}: {response.text}")
 
             logging.info(f"Successfully collected data for {city}")
             return True
@@ -110,34 +106,10 @@ class GitHubAQICollector:
             pd.DataFrame([error_record]).to_csv(
                 self.csv_path, mode='a', header=False, index=False
             )
+            # Optionally push error record to Power BI
+            if self.push_url:
+                requests.post(self.push_url, json=[error_record])
             return False
-
-    def push_to_powerbi(self, record):
-        """Push data to Power BI for the specific city and the main dataset"""
-        city = record['city']
-        city_push_url = self.push_urls.get(city)
-        if city_push_url:
-            try:
-                headers = {'Content-Type': 'application/json'}
-                response = requests.post(city_push_url, headers=headers, data=json.dumps([record]))
-                if response.status_code == 200:
-                    logging.info(f"Successfully pushed data to Power BI for {city}")
-                else:
-                    logging.error(f"Failed to push to city dataset for {city}: {response.status_code}")
-            except Exception as e:
-                logging.error(f"Error pushing to city dataset for {city}: {str(e)}")
-        
-        # Push to main dataset
-        if self.main_push_url:
-            try:
-                headers = {'Content-Type': 'application/json'}
-                response = requests.post(self.main_push_url, headers=headers, data=json.dumps([record]))
-                if response.status_code == 200:
-                    logging.info(f"Successfully pushed data to Power BI main dataset for {city}")
-                else:
-                    logging.error(f"Failed to push to main dataset for {city}: {response.status_code}")
-            except Exception as e:
-                logging.error(f"Error pushing to main dataset for {city}: {str(e)}")
 
     def collect_all_cities(self):
         """Collect data for all cities"""

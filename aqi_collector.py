@@ -1,4 +1,3 @@
-# aqi_collector.py
 import os
 import requests
 import pandas as pd
@@ -6,59 +5,49 @@ from datetime import datetime
 import time
 import logging
 from pathlib import Path
+import json
 
 class GitHubAQICollector:
     def __init__(self):
-        # Setup logging
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s'
-        )
-        
-        # OpenWeatherMap API key from GitHub secrets
+        # Set up logging
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+        # Get API key and Power BI Push URL from environment variables
         self.api_key = os.environ.get('OPENWEATHER_API_KEY')
-        
-        # Setup data storage
+        self.push_url = os.environ.get('POWERBI_PUSH_URL')
+        # Set up data directory and CSV path
         self.data_dir = Path('data')
         self.data_dir.mkdir(exist_ok=True)
         self.csv_path = self.data_dir / 'aqi_data.csv'
-        
-        # Initialize CSV if it doesn't exist
+        # Create CSV if it doesn’t exist
         if not self.csv_path.exists():
             self.setup_csv()
 
     def setup_csv(self):
-        """Initialize CSV file with headers"""
-        columns = [
-            'city', 'timestamp', 'aqi', 'co', 'no2', 'o3', 'so2',
-            'pm2_5', 'pm10', 'temperature', 'humidity', 'collection_status'
-        ]
+        # Define CSV columns
+        columns = ['city', 'timestamp', 'aqi', 'co', 'no2', 'o3', 'so2', 'pm2_5', 'pm10', 'temperature', 'humidity', 'collection_status']
         pd.DataFrame(columns=columns).to_csv(self.csv_path, index=False)
 
     def collect_data(self, city):
-        """Collect AQI data for a city"""
         try:
-            # Get coordinates
+            # Get city coordinates
             geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={self.api_key}"
             geo_response = requests.get(geo_url)
             geo_data = geo_response.json()
-
             if not geo_data:
                 raise Exception(f"No coordinates found for {city}")
-
             lat, lon = geo_data[0]['lat'], geo_data[0]['lon']
 
-            # Get AQI and weather data
+            # Fetch AQI data
             aqi_url = f"http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={self.api_key}"
-            weather_url = f"http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={self.api_key}&units=metric"
-
             aqi_response = requests.get(aqi_url)
-            weather_response = requests.get(weather_url)
-
             aqi_data = aqi_response.json()
+
+            # Fetch weather data
+            weather_url = f"http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={self.api_key}&units=metric"
+            weather_response = requests.get(weather_url)
             weather_data = weather_response.json()
 
-            # Prepare data record
+            # Create data record
             record = {
                 'city': city,
                 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -78,35 +67,40 @@ class GitHubAQICollector:
             df = pd.DataFrame([record])
             df.to_csv(self.csv_path, mode='a', header=False, index=False)
 
+            # Push to Power BI
+            self.push_to_powerbi(record)
+
             logging.info(f"Successfully collected data for {city}")
             return True
 
         except Exception as e:
+            # Handle errors
             logging.error(f"Error collecting data for {city}: {str(e)}")
-            # Log error record to CSV
-            error_record = {
-                'city': city,
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                'aqi': None, 'co': None, 'no2': None, 'o3': None,
-                'so2': None, 'pm2_5': None, 'pm10': None,
-                'temperature': None, 'humidity': None,
-                'collection_status': f'error: {str(e)}'
-            }
-            pd.DataFrame([error_record]).to_csv(
-                self.csv_path, mode='a', header=False, index=False
-            )
+            error_record = {key: None for key in ['city', 'timestamp', 'aqi', 'co', 'no2', 'o3', 'so2', 'pm2_5', 'pm10', 'temperature', 'humidity']}
+            error_record['city'] = city
+            error_record['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            error_record['collection_status'] = f'error: {str(e)}'
+            pd.DataFrame([error_record]).to_csv(self.csv_path, mode='a', header=False, index=False)
             return False
 
+    def push_to_powerbi(self, record):
+        # Method to push data to Power BI
+        try:
+            headers = {'Content-Type': 'application/json'}
+            response = requests.post(self.push_url, headers=headers, data=json.dumps([record]))
+            if response.status_code == 200:
+                logging.info(f"Successfully pushed data to Power BI for {record['city']}")
+            else:
+                logging.error(f"Failed to push data to Power BI: {response.status_code}")
+        except Exception as e:
+            logging.error(f"Error pushing data to Power BI: {str(e)}")
+
     def collect_all_cities(self):
-        """Collect data for all cities"""
-        cities = [
-            'Delhi', 'Mumbai', 'Chennai', 'Kolkata', 'Bengaluru',
-            'Ahmedabad', 'Lucknow', 'Hyderabad', 'Jaipur', 'Patna'
-        ]
-        
+        # List of cities to collect data for
+        cities = ['Delhi', 'Mumbai', 'Chennai', 'Kolkata', 'Bengaluru', 'Ahmedabad', 'Lucknow', 'Hyderabad', 'Jaipur', 'Patna']
         for city in cities:
             self.collect_data(city)
-            time.sleep(2)  # Rate limiting
+            time.sleep(2)  # Avoid hitting API rate limits
 
 if __name__ == "__main__":
     collector = GitHubAQICollector()

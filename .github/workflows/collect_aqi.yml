@@ -23,7 +23,17 @@ jobs:
     - name: Run collector
       env:
         OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-        POWERBI_PUSH_URL: ${{ secrets.POWERBI_PUSH_URL }}
+        POWERBI_PUSH_URL_DELHI: ${{ secrets.POWERBI_PUSH_URL_DELHI }}
+        POWERBI_PUSH_URL_MUMBAI: ${{ secrets.POWERBI_PUSH_URL_MUMBAI }}
+        POWERBI_PUSH_URL_CHENNAI: ${{ secrets.POWERBI_PUSH_URL_CHENNAI }}
+        POWERBI_PUSH_URL_KOLKATA: ${{ secrets.POWERBI_PUSH_URL_KOLKATA }}
+        POWERBI_PUSH_URL_BENGALURU: ${{ secrets.POWERBI_PUSH_URL_BENGALURU }}
+        POWERBI_PUSH_URL_AHMEDABAD: ${{ secrets.POWERBI_PUSH_URL_AHMEDABAD }}
+        POWERBI_PUSH_URL_LUCKNOW: ${{ secrets.POWERBI_PUSH_URL_LUCKNOW }}
+        POWERBI_PUSH_URL_HYDERABAD: ${{ secrets.POWERBI_PUSH_URL_HYDERABAD }}
+        POWERBI_PUSH_URL_JAIPUR: ${{ secrets.POWERBI_PUSH_URL_JAIPUR }}
+        POWERBI_PUSH_URL_PATNA: ${{ secrets.POWERBI_PUSH_URL_PATNA }}
+        POWERBI_PUSH_URL_ALL: ${{ secrets.POWERBI_PUSH_URL_ALL }}
       run: python aqi_collector.py
 
     - name: Prepare docs

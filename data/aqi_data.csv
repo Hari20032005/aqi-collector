@@ -41889,3 +41889,13 @@ Lucknow,2025-07-18 15:18:21,3,242.95,4.91,65.03,1.42,25.64,27.76,30.01,79,succes
 Hyderabad,2025-07-18 15:18:23,2,223.7,14.05,23.52,7.33,11.85,16.15,24.19,88,success
 Jaipur,2025-07-18 15:18:26,1,149.9,6.23,42.15,0.69,7.22,8.15,25.6,94,success
 Patna,2025-07-18 15:18:29,3,727.52,22.73,30.15,6.53,47.43,62.24,30.97,79,success
+Delhi,2025-07-18 16:23:29,3,426.3,9.72,57.37,2.16,28.68,30.39,29.06,79,success
+Mumbai,2025-07-18 16:23:40,1,69.9,0.1,37.77,0.17,4.52,10.58,29,79,success
+Chennai,2025-07-18 16:23:48,2,279.46,19.76,17.1,13.73,10.3,14.24,29.85,87,success
+Kolkata,2025-07-18 16:24:28,,,,,,,,,,"error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+Bengaluru,2025-07-18 16:24:53,1,172.84,8.06,17.29,1.4,4.35,6.4,21.35,89,success
+Ahmedabad,2025-07-18 16:25:09,1,118.72,4.54,34.54,1.99,3.79,9.63,29.04,70,success
+Lucknow,2025-07-18 16:27:24,,,,,,,,,,"error: HTTPConnectionPool(host='api.openweathermap.org', port=80): Max retries exceeded with url: /geo/1.0/direct?q=Lucknow&limit=1&appid=1ea3a842272c34af40b89cb5daf9ad59 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fbe1a2630d0>: Failed to establish a new connection: [Errno 101] Network is unreachable'))"
+Hyderabad,2025-07-18 16:27:56,2,241.04,14.39,18.82,6.71,11.63,16.21,24.19,88,success
+Jaipur,2025-07-18 16:29:16,,,,,,,,,,"error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+Patna,2025-07-18 16:29:23,4,829.18,26.29,22.48,7.83,53.65,70.92,30.97,79,success

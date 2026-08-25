@@ -115579,3 +115579,13 @@ Lucknow,2026-08-25 17:27:47,4,844.2,15.02,28.23,3.62,52.71,57,29.01,94,success
 Hyderabad,2026-08-25 17:27:49,1,149.04,8.63,29.74,5.92,3.46,4.94,26.27,75,success
 Jaipur,2026-08-25 17:27:52,2,202.76,7.63,49.23,1.62,16.94,25.08,26.62,94,success
 Patna,2026-08-25 17:27:55,4,810.29,11.53,23.43,4.93,64.56,74.07,29.97,84,success
+Delhi,2026-08-25 18:34:15,5,778.43,28.18,14.41,2.4,77.59,92.78,27.99,94,success
+Mumbai,2026-08-25 18:34:33,1,69.51,0.07,38.7,0.25,6.32,12.77,29.01,79,success
+Chennai,2026-08-25 18:34:44,2,250.43,20.74,15.82,14.25,12.37,18.28,29.02,80,success
+Kolkata,2026-08-25 18:34:55,3,267.72,2.44,74.39,2.06,33.5,37.03,28.96,94,success
+Bengaluru,2026-08-25 18:34:57,1,230.18,11.3,18.74,2.9,7.13,11.59,21.96,86,success
+Ahmedabad,2026-08-25 18:35:14,1,108.36,3.28,30.82,2.04,8.87,18.51,28.04,74,success
+Lucknow,2026-08-25 18:35:32,3,811.61,14.34,24.16,2.99,48.39,51.25,28.01,100,success
+Hyderabad,2026-08-25 18:35:41,1,146.04,8.73,22.86,4.69,3.39,4.95,26.21,75,success
+Jaipur,2026-08-25 18:35:59,,,,,,,,,,"error: HTTPConnectionPool(host='api.openweathermap.org', port=80): Max retries exceeded with url: /geo/1.0/direct?q=Jaipur&limit=1&appid=1ea3a842272c34af40b89cb5daf9ad59 (Caused by NewConnectionError(""HTTPConnection(host='api.openweathermap.org', port=80): Failed to establish a new connection: [Errno 101] Network is unreachable""))"
+Patna,2026-08-25 18:36:02,4,798.9,11.47,21.97,4.37,63.29,71.39,29.97,84,success
